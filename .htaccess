@@ -1,0 +1,14 @@
+
+RewriteEngine On
+
+# Reescribir URLs sin extensión a archivos PHP
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*)$ $1.php [L]
+
+# Reescribir URLs sin extensión a archivos HTML
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.*)$ $1.html [L]
+
+# Reescribir URLs sin extensión a archivos JS
+RewriteCond %{REQUEST_FILENAME}.js -f
+RewriteRule ^(.*)$ $1.js [L]

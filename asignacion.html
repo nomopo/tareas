@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignación de Tareas</title>
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="./assets/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 Free CSS -->
+    <link href="./assets/css/all.min.css" rel="stylesheet">
+    <!-- Estilos personalizados -->
+    <link href="./assets/css/styles.css" rel="stylesheet">
+    <style>
+        .table-container {
+            margin-top: 50px;
+        }
+        .table-title {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        .btn-send-email {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container table-container">
+        <h1 class="table-title">Asignación de Tareas</h1>
+        <table class="table table-bordered table-striped">
+            <thead class="table-primary">
+                <tr>
+                    <th>Participante</th>
+                    <th>Tareas</th>
+                </tr>
+            </thead>
+            <tbody id="assignmentTableBody"></tbody>
+        </table>
+        <button id="sendEmail" class="btn btn-success btn-send-email">Enviar por Correo</button>
+    </div>
+
+    <!-- jQuery -->
+    <script src="./assets/js/jquery.min.js"></script>
+    <script src="./assets/js/jquery.ui.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="./assets/js/bootstrap.bundle.min.js"></script>   
+    <!-- JavaScript personalizado -->
+    <script src="./assets/js/main.js"></script>   
+
+    <script>
+        $(document).ready(function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const assignmentData = JSON.parse(decodeURIComponent(urlParams.get('data')));
+
+            for (const participant in assignmentData) {
+                const email = assignmentData[participant].email;
+                const tasks = assignmentData[participant].tasks.join(', ');
+                const row = `
+                    <tr>
+                        <td>${participant}</td>
+                        <td>${tasks}</td>
+                    </tr>
+                `;
+                $('#assignmentTableBody').append(row);
+            }
+
+            $('#sendEmail').on('click', function() {
+                $.ajax({
+                    url: './php/send_email.php', // Asegúrate de que esta ruta sea correcta
+                    method: 'POST',
+                    data: { assignments: JSON.stringify(assignmentData) },
+                    success: function(response) {
+                        alert('Correos enviados exitosamente.');
+                        console.log(response); // Mostrar la respuesta en la consola
+                        //window.location.href = 'index.html';
+                    },
+                    error: function() {
+                        alert('Error al enviar los correos.');
+                    }
+                });
+            });
+            //console.log(assignmentData);
+        });
+    </script>
+</body>
+</html>
