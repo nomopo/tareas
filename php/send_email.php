@@ -91,6 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->SMTPSecure = 'ssl';
             $mail->Port = 465;
 
+            // Configurar la codificación a UTF-8
+            $mail->CharSet = 'UTF-8';
+
             // Habilitar el registro de depuración
             // $mail->SMTPDebug = 2; // 0 = off (producción), 1 = mensajes del cliente, 2 = mensajes del cliente y servidor
             // $mail->Debugoutput = 'html'; // Mostrar el resultado en formato HTML
