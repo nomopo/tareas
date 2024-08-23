@@ -21,13 +21,16 @@
         .btn-send-email {
             margin-top: 20px;
         }
+        .task-completed {
+            text-decoration: line-through;
+        }
     </style>
 </head>
 <body>
     <div class="container table-container">
-        <h1 class="table-title">Asignación de Tareas</h1>
+        <h1 class="table-title text-center">Asignación de Tareas</h1>
         <table class="table table-bordered table-striped">
-            <thead class="table-primary">
+            <thead class="table-primary text-center">
                 <tr>
                     <th>Participante</th>
                     <th>Tareas</th>
@@ -35,9 +38,17 @@
             </thead>
             <tbody id="assignmentTableBody"></tbody>
         </table>
-        <button id="sendEmail" class="btn btn-success btn-send-email">Enviar por Correo</button>
-    </div>
+        <div class="text-center">
+            <button id="sendEmail" class="btn btn-success btn-send-email text-center">Enviar por Correo</button>
 
+        </div>
+    </div>
+    <div class="privacy mt-lg-5 container border-1 shadow rounded p-lg-3">
+        <p>En nuestra web, nos tomamos muy en serio la privacidad y seguridad de los datos de nuestros usuarios. Queremos asegurarte que los datos proporcionados en nuestro sitio no se almacenan en ningún momento. Toda la información que nos proporcionas se utiliza exclusivamente para generar las listas solicitadas, y una vez cumplido este propósito, los datos se eliminan de inmediato de nuestros sistemas.</p>
+        <p>Asimismo, al enviar correos electrónicos a través de nuestra plataforma, estos se procesan de manera directa y no se guarda ninguna copia de los mismos. De esta forma, garantizamos que la información contenida en los correos se mantenga segura y privada.</p>
+        <p>Nuestro compromiso es ofrecerte un servicio eficiente, respetando siempre tu privacidad y protegiendo tus datos personales. Si tiene alguna pregunta o inquietud, no dude en contactarnos.</p>
+        <p class="text-center"><strong><a href="mailto:info@tareas.nredes.dev">Contáctenos</a></strong></p>
+    </div>
     <!-- jQuery -->
     <script src="./assets/js/jquery.min.js"></script>
     <script src="./assets/js/jquery.ui.min.js"></script>
@@ -53,7 +64,12 @@
 
             for (const participant in assignmentData) {
                 const email = assignmentData[participant].email;
-                const tasks = assignmentData[participant].tasks.join(', ');
+                const tasks = assignmentData[participant].tasks.map(task => `
+                    <div>
+                        <input type="checkbox" id="${participant}-${task}" class="task-checkbox">
+                        <label for="${participant}-${task}" class="task-label">${task}</label>
+                    </div>
+                `).join('');
                 const row = `
                     <tr>
                         <td>${participant}</td>
@@ -63,7 +79,29 @@
                 $('#assignmentTableBody').append(row);
             }
 
+            // Evento para tachar la tarea cuando se hace click en el checkbox
+            $(document).on('change', '.task-checkbox', function() {
+                const label = $(this).next('.task-label');
+                if (this.checked) {
+                    label.addClass('task-completed');
+                } else {
+                    label.removeClass('task-completed');
+                }
+            });
+
             $('#sendEmail').on('click', function() {
+                // Actualizar el estado de las tareas en assignmentData
+                $('#assignmentTableBody tr').each(function() {
+                    const participant = $(this).find('td:first').text();
+                    const tasks = [];
+                    $(this).find('.task-checkbox').each(function() {
+                        const task = $(this).next('.task-label').text();
+                        const completed = $(this).is(':checked');
+                        tasks.push({ task, completed });
+                    });
+                    assignmentData[participant].tasks = tasks;
+                });
+
                 $.ajax({
                     url: './php/send_email.php', // Asegúrate de que esta ruta sea correcta
                     method: 'POST',
@@ -71,14 +109,13 @@
                     success: function(response) {
                         alert('Correos enviados exitosamente.');
                         console.log(response); // Mostrar la respuesta en la consola
-                        window.location.href = 'index.html';
+                        //window.location.href = 'index.html';
                     },
                     error: function() {
                         alert('Error al enviar los correos.');
                     }
                 });
             });
-            //console.log(assignmentData);
         });
     </script>
 </body>

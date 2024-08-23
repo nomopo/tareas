@@ -34,8 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $tasksHtml = '';
-        foreach ($data['tasks'] as $task) {
-            $tasksHtml .= "<div><input type='checkbox' disabled> {$task}</div>";
+        foreach ($data['tasks'] as $taskData) {
+            $task = $taskData['task'];
+            $completed = $taskData['completed'] ? 'checked' : '';
+            $taskClass = $taskData['completed'] ? 'style="text-decoration: line-through;"' : '';
+            $tasksHtml .= "<div><input type='checkbox' disabled {$completed}> <span {$taskClass}>{$task}</span></div>";
         }
 
         $tableRows .= "
